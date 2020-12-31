@@ -20,13 +20,13 @@
           >
             <a-menu-item key="app">
               <router-link to="/">
-                <a-icon type="mail" />
+                <a-icon type="check" />
                 ToDo App
               </router-link>
             </a-menu-item>
             <a-menu-item key="about">
               <router-link to="/about">
-                <a-icon type="appstore" />
+                <a-icon type="question" />
                 About
               </router-link>
             </a-menu-item>
@@ -36,7 +36,9 @@
       <a-layout-content>
         <router-view />
       </a-layout-content>
-      <a-layout-footer>Footer</a-layout-footer>
+      <a-layout-footer>
+        2020 &copy; Abdullah Jalil
+      </a-layout-footer>
     </a-layout>
   </div>
 </template>

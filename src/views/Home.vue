@@ -1,7 +1,7 @@
 <template>
   <div class="home" :style="homeDivStyle">
     <a-row type="flex" justify="center" align="top" class="contentRow">
-      <a-col :span="18" class="contentCol">
+      <a-col :xs="22" :md="8" class="contentCol">
         <to-do />
       </a-col>
     </a-row>
@@ -22,7 +22,7 @@ export default {
     ToDo
   },
   computed: {
-    homeDivStyle: function() {
+    homeDivStyle() {
       return 'height: ' + (this.windowHeight - 64 - 69) + 'px';
     }
   },

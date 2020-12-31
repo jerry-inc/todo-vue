@@ -1,6 +1,6 @@
 <template>
   <a-row type="flex" justify="center" align="top">
-    <a-col :span="6" style="">
+    <a-col :span="22" style="">
       <div class="todoApp">
         <div class="title">What do I need to do today?</div>
         <a-form :form="form" @submit="handleSubmit" :wrapper-col="{ span: 24 }">
@@ -28,19 +28,15 @@
           </a-form-item>
         </a-form>
 
-        <div
-          v-if="
-            this.$store.getters.getItems &&
-              this.$store.getters.getItems.length > 0
-          "
-        >
+        <div v-if="todoList && todoList.length > 0">
           <div class="title">Today, you've got to do...</div>
 
           <a-list
             class="demo-loadmore-list"
             item-layout="horizontal"
             size="small"
-            :data-source="this.$store.getters.getItems"
+            :data-source="todoList"
+            :pagination="pagination"
           >
             <a-list-item slot="renderItem" slot-scope="item">
               <a slot="actions" @click="deleteItem(item.id)">delete</a>
@@ -67,7 +63,14 @@ export default {
   name: 'ToDo',
   data() {
     return {
-      form: this.$form.createForm(this, { name: 'toDoForm' })
+      form: this.$form.createForm(this, { name: 'toDoForm' }),
+      currentPage: 1,
+      todoList: [],
+      pagination: {
+        pageSize: 5,
+        total: 1,
+        size: 'small'
+      }
     };
   },
   methods: {
@@ -108,17 +111,29 @@ export default {
           })
           .catch(function(error) {
             _this.$message.error('There was an error in deleting item.');
-            console.log(error);
+            console.error(error);
           });
       } else {
         _this.$message.error('There was an error in deleting item.');
-        console.log('Invalid ID');
+        console.error('Invalid ID');
       }
     }
   },
   mounted() {},
   beforeCreate: function() {
-    this.$store.dispatch('setItems');
+    const _this = _this;
+    this.$store
+      .dispatch('getListFromServer')
+      .then(() => {
+        this.todoList = this.$store.getters.getList;
+        this.pagination.total = this.todoList.length;
+      })
+      .catch(function(error) {
+        _this.$message.error(
+          'There was an error in Obtaining Data from Server'
+        );
+        console.error(error);
+      });
   },
   beforeDestroy() {}
 };
