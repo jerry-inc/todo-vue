@@ -1,32 +1,54 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view />
+  <div id="components-layout-demo-basic">
+    <a-layout>
+      <a-layout-header>
+        <div class="titleDiv">
+          <img
+            alt="Vue logo"
+            src="@/assets/logo.png"
+            id="vue-logo"
+            class="logoImg"
+          />
+          <h1 class="titleText">ToDo</h1>
+        </div>
+        <div class="titleMenuDiv">
+          <a-menu
+            v-model="current"
+            mode="horizontal"
+            theme="dark"
+            class="topNavMenu"
+          >
+            <a-menu-item key="app">
+              <router-link to="/">
+                <a-icon type="mail" />
+                ToDo App
+              </router-link>
+            </a-menu-item>
+            <a-menu-item key="about">
+              <router-link to="/about">
+                <a-icon type="appstore" />
+                About
+              </router-link>
+            </a-menu-item>
+          </a-menu>
+        </div>
+      </a-layout-header>
+      <a-layout-content>
+        <router-view />
+      </a-layout-content>
+      <a-layout-footer>Footer</a-layout-footer>
+    </a-layout>
   </div>
 </template>
 
-<style lang="less">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
+<script>
+export default {
+  data() {
+    return {
+      current: ['app']
+    };
   }
-}
-</style>
+};
+</script>
+
+<style lang="less"></style>
