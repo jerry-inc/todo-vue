@@ -16,5 +16,5 @@ cd dist
 git init
 git add -A
 git commit -m 'deploy'
-git push -f git@github.com:username/todo-vue.git master:gh-pages
+git push -f git@github.com:jerry-inc/todo-vue.git master:gh-pages
 cd -
