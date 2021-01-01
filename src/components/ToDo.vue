@@ -3,6 +3,7 @@
     <a-col :span="22" style="">
       <div class="todoApp">
         <div class="title">What do I need to do today?</div>
+        <!-- Input for adding new item in Todo -->
         <a-form :form="form" @submit="handleSubmit" :wrapper-col="{ span: 24 }">
           <a-form-item>
             <a-row :gutter="4">
@@ -27,30 +28,54 @@
             </a-row>
           </a-form-item>
         </a-form>
-
-        <div v-if="todoList && todoList.length > 0">
-          <div class="title">Today, you've got to do...</div>
-
-          <a-list
-            class="demo-loadmore-list"
-            item-layout="horizontal"
-            size="small"
-            :data-source="todoList"
-            :pagination="pagination"
-          >
-            <a-list-item slot="renderItem" slot-scope="item">
-              <a slot="actions" @click="deleteItem(item.id)">delete</a>
-              <a-list-item-meta description="">
-                <p slot="title">
-                  {{ item.title }}
-                </p>
-              </a-list-item-meta>
-            </a-list-item>
-          </a-list>
-        </div>
-        <div v-else>
-          <a-empty />
-        </div>
+        <!-- Spinner For Loading -->
+        <template v-if="ready === false">
+          <div class="spinnerDiv">
+            <a-spin tip="Loading...">
+              <a-icon
+                slot="indicator"
+                type="loading"
+                style="font-size: 24px"
+                spin
+              />
+            </a-spin>
+          </div>
+        </template>
+        <!-- Showing List of Item from Server -->
+        <template v-else>
+          <div v-if="todoList && todoList.length > 0">
+            <div class="title">Today, you've got to do...</div>
+            <a-list
+              class="demo-loadmore-list"
+              item-layout="horizontal"
+              size="small"
+              :data-source="todoList"
+              :pagination="pagination"
+            >
+              <a-list-item slot="renderItem" slot-scope="item">
+                <div slot="actions">
+                  <a-popconfirm
+                    title="Are you sure delete this task?"
+                    ok-text="Yes"
+                    cancel-text="No"
+                    @confirm="deleteItem(item.id)"
+                  >
+                    <a-icon class="redColor" type="delete" />
+                  </a-popconfirm>
+                </div>
+                <a-list-item-meta description="">
+                  <p slot="title">
+                    {{ item.title }}
+                  </p>
+                </a-list-item-meta>
+              </a-list-item>
+            </a-list>
+          </div>
+          <!-- Show Empty if no Item found -->
+          <div v-else>
+            <a-empty />
+          </div>
+        </template>
       </div>
     </a-col>
   </a-row>
@@ -70,16 +95,32 @@ export default {
         pageSize: 5,
         total: 1,
         size: 'small'
-      }
+      },
+      ready: false
     };
   },
   methods: {
+    loadData() {
+      this.ready = false;
+      this.$store
+        .dispatch('getListFromServer')
+        .then(() => {
+          this.todoList = this.$store.getters.getList;
+          this.pagination.total = this.todoList.length;
+          this.ready = true;
+        })
+        .catch(function(error) {
+          this.$message.error(
+            'There was an error in Obtaining Data from Server'
+          );
+          console.error(error);
+        });
+    },
     handleSubmit(e) {
       e.preventDefault();
       let _this = this;
       this.form.validateFields((err, values) => {
         if (!err) {
-          console.log('Received values of form: ', values);
           db.collection('todo-list')
             .add({
               title: values.todo,
@@ -90,6 +131,7 @@ export default {
                 _this.$message.success('Item added to list');
                 _this.myTodo = '';
                 _this.form.resetFields();
+                _this.loadData();
               }
             })
             .catch(error => {
@@ -108,6 +150,7 @@ export default {
           .then(function() {
             console.log('Document successfully deleted');
             _this.$message.success('Successfully deleted.');
+            _this.loadData();
           })
           .catch(function(error) {
             _this.$message.error('There was an error in deleting item.');
@@ -120,20 +163,8 @@ export default {
     }
   },
   mounted() {},
-  beforeCreate: function() {
-    const _this = _this;
-    this.$store
-      .dispatch('getListFromServer')
-      .then(() => {
-        this.todoList = this.$store.getters.getList;
-        this.pagination.total = this.todoList.length;
-      })
-      .catch(function(error) {
-        _this.$message.error(
-          'There was an error in Obtaining Data from Server'
-        );
-        console.error(error);
-      });
+  created() {
+    this.loadData();
   },
   beforeDestroy() {}
 };
@@ -149,5 +180,14 @@ export default {
 .title {
   font-weight: bold;
   padding: 10px 0;
+}
+
+.spinnerDiv {
+  text-align: center;
+  padding-top: 50px;
+}
+
+.redColor {
+  color: #d60808;
 }
 </style>

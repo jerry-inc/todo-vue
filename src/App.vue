@@ -47,8 +47,22 @@
 export default {
   data() {
     return {
-      current: ['app']
+      current: []
     };
+  },
+  methods: {
+    setActiveMenu(menu) {
+      this.current = [menu];
+    }
+  },
+  mounted() {
+    let menu = '';
+    if (window.location.pathname === '/about') {
+      menu = 'about';
+    } else {
+      menu = 'app';
+    }
+    this.setActiveMenu(menu);
   }
 };
 </script>
